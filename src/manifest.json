@@ -14,7 +14,7 @@
   },
   "host_permissions": ["https://www.googleapis.com/*"],
   "oauth2": {
-    "client_id": "140727364650-0c6pnls1ish7adsi8soii564o1or3nlf.apps.googleusercontent.com",
+    "client_id": "<client_id>.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/calendar.events"]
   },
   "background": {
