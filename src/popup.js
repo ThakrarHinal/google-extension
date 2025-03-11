@@ -1,60 +1,64 @@
 let recognizing = false;
-const recordBtn = document.getElementById('record-btn');
-const status = document.getElementById('status');
+const recordBtn = document.getElementById("record-btn");
+const status = document.getElementById("status");
 
-const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognition.lang = 'en-US';
+const recognition = new (window.SpeechRecognition ||
+  window.webkitSpeechRecognition)();
+recognition.lang = "en-US";
 
-recordBtn.addEventListener('click', () => {
-    console.log("working>>>")
-    console.log({recognition, recognizing})
-    console.log("Record Button:", recordBtn);
+recordBtn.addEventListener("click", () => {
+  console.log("working>>>");
+  console.log({ recognition, recognizing });
+  console.log("Record Button:", recordBtn);
   if (recognizing) {
     recognition.stop();
     return;
   }
-  navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(stream => {
+  navigator.mediaDevices
+    .getUserMedia({ audio: true })
+    .then((stream) => {
       console.log("Microphone access granted");
-      stream.getTracks().forEach(track => track.stop());  // Stop the mic immediately after getting permission
-      recognition.start();  // Start speech recognition
+      stream.getTracks().forEach((track) => track.stop()); // Stop the mic immediately after getting permission
+      recognition.start(); // Start speech recognition
     })
-    .catch(error => {
+    .catch((error) => {
       console.error("Microphone access denied:", error);
-      status.textContent = 'Microphone access denied. Please enable it and try again.';
+      status.textContent =
+        "Microphone access denied. Please enable it and try again.";
     });
 });
 
 recognition.onstart = () => {
-    console.log("recognition has started>>>>")
+  console.log("recognition has started>>>>");
   recognizing = true;
-  status.textContent = 'Listening...';
+  status.textContent = "Listening...";
 };
 
 recognition.onend = () => {
   recognizing = false;
-  status.textContent = 'Press the button and speak...';
+  status.textContent = "Press the button and speak...";
 };
 
 recognition.onresult = async (event) => {
   const transcript = event.results[0][0].transcript;
   status.textContent = `You said: "${transcript}"`;
-  
+
   const eventData = parseEvent(transcript);
   if (eventData) {
-    status.textContent = 'Creating event...';
+    status.textContent = "Creating event...";
     const success = await createCalendarEvent(eventData);
-    status.textContent = success ? 'Event created successfully!' : 'Failed to create event.';
+    status.textContent = success
+      ? "Event created successfully!"
+      : "Failed to create event.";
   } else {
-    status.textContent = 'Could not understand the event details.';
+    status.textContent = "Could not understand the event details.";
   }
 };
 
 recognition.onerror = (event) => {
-    console.error("Recognition Error:", event.error);
-    status.textContent = `Error: ${event.error}`;
+  console.error("Recognition Error:", event.error);
+  status.textContent = `Error: ${event.error}`;
 };
-
 
 // Parse voice input into event data
 function parseEvent(input) {
@@ -64,9 +68,9 @@ function parseEvent(input) {
 
   if (titleMatch) {
     return {
-      summary: titleMatch[1] || 'Untitled Event',
+      summary: titleMatch[1] || "Untitled Event",
       date: dateMatch ? dateMatch[1] : new Date().toLocaleDateString(),
-      time: timeMatch ? timeMatch[1] : '10:00 AM'
+      time: timeMatch ? timeMatch[1] : "10:00 AM",
     };
   }
   return null;
@@ -75,59 +79,61 @@ function parseEvent(input) {
 // Create event using Google Calendar API
 async function createCalendarEvent(eventData) {
   try {
-    console.log("into create cal function>>>>")
-      const token = await getAuthToken();
-      console.log("into create functions>>>>>>", {token})
-      const startDate = new Date(`${eventData.date} ${eventData.time}`);
-const endDate = new Date(startDate);
-endDate.setHours(startDate.getHours() + 1);
+    console.log("into create cal function>>>>");
+    const token = await getAuthToken();
+    console.log("into create functions>>>>>>", { token });
+    const startDate = new Date(`${eventData.date} ${eventData.time}`);
+    const endDate = new Date(startDate);
+    endDate.setHours(startDate.getHours() + 1);
     const event = {
       summary: eventData.summary,
       start: {
-        dateTime: startDate.toISOString()
+        dateTime: startDate.toISOString(),
       },
       end: {
-        dateTime: endDate.toISOString()
-      }
+        dateTime: endDate.toISOString(),
+      },
     };
 
-    console.log({event})
+    console.log({ event });
 
     let response;
     try {
-        
-         response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-          method: 'POST',
+      response = await fetch(
+        "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+        {
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(event)
-        });
-    
-        console.log({response: response.json()})
+          body: JSON.stringify(event),
+        }
+      );
+
+      console.log({ response: response.json() });
     } catch (error) {
-        console.log({error}, "checking error")
+      console.log({ error }, "checking error");
     }
     return response.ok;
-} catch (error) {
-    console.error('Error creating event:', error);
+  } catch (error) {
+    console.error("Error creating event:", error);
     return false;
   }
 }
 
 // Get OAuth token
 async function getAuthToken() {
-  const result =  new Promise((resolve, reject) => {
+  const result = new Promise((resolve, reject) => {
     chrome.identity.getAuthToken({ interactive: true }, (token) => {
       if (chrome.runtime.lastError || !token) {
         reject(chrome.runtime.lastError);
       } else {
-        console.log("into else condition>>>>>")
+        console.log("into else condition>>>>>");
         resolve(token);
       }
     });
   });
-  console.log({result})
-  return result
+  console.log({ result });
+  return result;
 }

@@ -1,28 +1,23 @@
 {
-    "manifest_version": 3,
-    "name": "Voice Calendar",
-    "version": "1.0",
-    "description": "Create Google Calendar events using voice commands.",
-    "permissions": ["identity", "identity.email", "storage"],
-    "action": {
-      "default_popup": "popup.html",
-      "default_icon": {
-        "16": "icons/icon16.png",
-        "48": "icons/icon48.png",
-        "128": "icons/icon128.png"
-      }
-    },
-    "host_permissions": [
-    "https://www.googleapis.com/*"
-  ],
-    "oauth2": {
-      "client_id": "<client_id>.apps.googleusercontent.com",
-      "scopes": [
-        "https://www.googleapis.com/auth/calendar.events"
-      ]
-    },
-    "background": {
-      "service_worker": "background.js"
+  "manifest_version": 3,
+  "name": "Voice Calendar",
+  "version": "1.0",
+  "description": "Create Google Calendar events using voice commands.",
+  "permissions": ["identity", "identity.email", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
     }
+  },
+  "host_permissions": ["https://www.googleapis.com/*"],
+  "oauth2": {
+    "client_id": "140727364650-0c6pnls1ish7adsi8soii564o1or3nlf.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/calendar.events"]
+  },
+  "background": {
+    "service_worker": "background.js"
   }
-  
+}
